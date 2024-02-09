@@ -1,5 +1,5 @@
 import { Image, Text, View } from "react-native";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { Redirect, useLocalSearchParams, useNavigation } from "expo-router";
 import { PRODUCTS } from "@/utils/data/products";
 import { formatCurrency } from "@/utils/functions/format-currency";
 import { Button } from "@/components/Button";
@@ -12,11 +12,16 @@ export default function Product() {
   const navigation = useNavigation();
   const cartStore = useCartStore();
 
-  const product = PRODUCTS.filter((item) => item.id === id)[0];
-  console.log(cartStore.products);
+  const product = PRODUCTS.find((item) => item.id === id);
   function handleAddToCard() {
-    cartStore.add(product);
-    navigation.goBack();
+    if (product) {
+      cartStore.add(product);
+      navigation.goBack();
+    }
+  }
+
+  if (!product) {
+    return <Redirect href="/" />
   }
 
   return (
@@ -28,6 +33,7 @@ export default function Product() {
       />
 
       <View className="flex-1 p-5 mt-8">
+        <Text className="text-white text-xl font-heading">{product.title}</Text>
         <Text className="my-2 text-2xl text-lime-400 font-heading">
           {formatCurrency(product.price)}
         </Text>
